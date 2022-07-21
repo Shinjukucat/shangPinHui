@@ -2,7 +2,38 @@
   <!-- 商品分类导航 -->
   <div class="tab-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <div @mouseleave="resetIndex">
+        <h2 class="all">全部商品分类</h2>
+        <!-- 三级联动 -->
+        <div class="sort">
+          <!-- 事件委派 + 编程式导航 -->
+        <div class="all-sort-list2" @click="goSearch">
+          <!-- 一级菜单 -->
+          <div class="item" v-for="(menu1, index) in categoryList" :key="menu1.categoryId" :class="{cur: currentIndex == index}">
+            <h3 @mouseenter="changeIndex(index)" >
+              <a :data-categoryName="menu1.categoryName" :data-category1Id="menu1.categoryId">{{menu1.categoryName}}</a>
+            </h3>
+            <!-- 二级菜单 -->
+            <div class="item-list clearfix" :style="{display: currentIndex == index ? 'block' : 'none'}">
+              <div class="subitem" v-for="(menu2) in menu1.categoryChild" :key="menu2.categoryId">
+                <dl class="fore">
+                  <dt>
+                    <a :data-categoryName="menu2.categoryName" :data-category2Id="menu2.categoryId">{{menu2.categoryName}}</a>
+                  </dt>
+                  <!-- 三级菜单 -->
+                  <dd>
+                    <em v-for="(menu3) in menu2.categoryChild" :key="menu3.categoryId">
+                      <a :data-categoryName="menu3.categoryName"  :data-category3Id="menu3.categoryId">{{menu3.categoryName}}</a>
+                    </em>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -13,40 +44,26 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
-        <div class="all-sort-list2">
-          <!-- 一级菜单 -->
-          <div class="item" v-for="(menu1) in categoryList" :key="menu1.categoryId">
-            <h3>
-              <a href="">{{menu1.categoryName}}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem" v-for="(menu2) in menu1.categoryChild" :key="menu2.categoryId">
-                <dl class="fore">
-                  <dt>
-                    <a href="">{{menu2.categoryName}}</a>
-                  </dt>
-                  <dd>
-                    <em v-for="(menu3) in menu2.categoryChild" :key="menu3.categoryId">
-                      <a href="">{{menu3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
 
 <script>
+// import _ from 'lodash'
+// 按需引入
+import throttle from 'lodash/throttle'
 // 用mapState辅助函数去获取vuex里面的数据
 import {mapState} from 'vuex';
 export default {
   // name名字起作用了！！在注册全局组件的时候可以直接引用这个名字
   name: 'TabNav',
+  data() {
+    return {
+      // 记录处于活跃状态的索引值
+      currentIndex: -1
+    }
+  },
   // 组件挂载完毕，可以发请求了
   mounted() {
     // 通知vuex发请求，获取数据，存储于仓库中
@@ -63,6 +80,50 @@ export default {
         return state.home.categoryList;
       }
     })
+  },
+  methods: {
+    // 监听鼠标经过
+    // changeIndex(index) {
+    //   // 当这步操作过快时，浏览器反应不过来，无法完整执行，当回调函数中数据较大时就会出现卡顿现象
+    //   this.currentIndex = index
+    // },
+    // 通过回流的方法执行函数，用ES5写法  因为上面按需引入，这里直接使用throttle这个函数就可以了，不用加 _. 
+    changeIndex: throttle(function(index) {
+      this.currentIndex = index
+    }, 50),
+    // 监听鼠标离开，还原currentIndex
+    resetIndex() {
+      this.currentIndex = -1
+    },
+    // 进行路由跳转的方法
+    goSearch(event) {
+      // 最好的解决方案：编程式导航 + 事件委派
+      // 利用事件委派又存在一些问题：1.如何确定点击的是a标签  2.如何确定点击的是第几级的a标签  3.如何获取参数【1/2/3级分类的产品名字和id】
+
+      // 第一个问题：把子节点当中的a标签，加上自定义属性data-categoryname，其余的节点是没有的
+      let element = event.target;
+      // 获取到当前触发这个事件的节点，带有data-categoryname节点的就是a标签
+      // 节点有一个dataset属性，可以获取节点的自定义属性和属性值，将各个属性结构出来
+      let {categoryname, category1id, category2id, category3id} = element.dataset;
+      // 如果节点有categoryname属性就一定是a标签
+      if(categoryname) {
+        // 整理路由跳转参数
+        let location = {name: "Search"};
+        let query = {categoryName: categoryname};
+        // 一级分类、二级分类、三级分类的a标签
+        if(category1id) {
+          query.category1Id = category1id;
+        } else if(category2id) {
+          query.category2Id = category2id;
+        } else {
+          query.category3Id = category3id;
+        }
+        // 整理完参数，location里面name是跳转到的地址，query是传入的参数
+        location.query = query;
+        // 路由跳转
+        this.$router.push(location);
+      }
+    }
   }
 };
 </script>
@@ -176,12 +237,9 @@ export default {
               }
             }
           }
-
-          &:hover {
-            .item-list {
-              display: block;
-            }
-          }
+        }
+        .cur {
+          background-color: skyblue;
         }
       }
     }
