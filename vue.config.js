@@ -3,7 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
 
-  // 代理跨域，解决跨域问题
+  // 代理跨域，解决跨域问题，proxy就是代理服务器或叫代理软件(具体见标签栏收藏)
   devServer: {
     proxy: {
       '/api': {

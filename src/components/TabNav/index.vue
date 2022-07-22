@@ -2,36 +2,38 @@
   <!-- 商品分类导航 -->
   <div class="tab-nav">
     <div class="container">
-      <div @mouseleave="resetIndex">
+      <div @mouseleave="hiddenTabNav" @mouseenter="showTabNav">
         <h2 class="all">全部商品分类</h2>
-        <!-- 三级联动 -->
-        <div class="sort">
-          <!-- 事件委派 + 编程式导航 -->
-        <div class="all-sort-list2" @click="goSearch">
-          <!-- 一级菜单 -->
-          <div class="item" v-for="(menu1, index) in categoryList" :key="menu1.categoryId" :class="{cur: currentIndex == index}">
-            <h3 @mouseenter="changeIndex(index)" >
-              <a :data-categoryName="menu1.categoryName" :data-category1Id="menu1.categoryId">{{menu1.categoryName}}</a>
-            </h3>
-            <!-- 二级菜单 -->
-            <div class="item-list clearfix" :style="{display: currentIndex == index ? 'block' : 'none'}">
-              <div class="subitem" v-for="(menu2) in menu1.categoryChild" :key="menu2.categoryId">
-                <dl class="fore">
-                  <dt>
-                    <a :data-categoryName="menu2.categoryName" :data-category2Id="menu2.categoryId">{{menu2.categoryName}}</a>
-                  </dt>
-                  <!-- 三级菜单 -->
-                  <dd>
-                    <em v-for="(menu3) in menu2.categoryChild" :key="menu3.categoryId">
-                      <a :data-categoryName="menu3.categoryName"  :data-category3Id="menu3.categoryId">{{menu3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
+        <transition name="sort">
+          <!-- 三级联动 -->
+          <div class="sort" v-show="show">
+            <!-- 事件委派 + 编程式导航 -->
+            <div class="all-sort-list2" @click="goSearch">
+              <!-- 一级菜单 -->
+              <div class="item" v-for="(menu1, index) in categoryList" :key="menu1.categoryId" :class="{cur: currentIndex == index}">
+                <h3 @mouseenter="changeIndex(index)" >
+                  <a :data-categoryName="menu1.categoryName" :data-category1Id="menu1.categoryId">{{menu1.categoryName}}</a>
+                </h3>
+                <!-- 二级菜单 -->
+                <div class="item-list clearfix" :style="{display: currentIndex == index ? 'block' : 'none'}">
+                  <div class="subitem" v-for="(menu2) in menu1.categoryChild" :key="menu2.categoryId">
+                    <dl class="fore">
+                      <dt>
+                        <a :data-categoryName="menu2.categoryName" :data-category2Id="menu2.categoryId">{{menu2.categoryName}}</a>
+                      </dt>
+                      <!-- 三级菜单 -->
+                      <dd>
+                        <em v-for="(menu3) in menu2.categoryChild" :key="menu3.categoryId">
+                          <a :data-categoryName="menu3.categoryName"  :data-category3Id="menu3.categoryId">{{menu3.categoryName}}</a>
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </transition>
       </div>
       
       <nav class="nav">
@@ -61,13 +63,20 @@ export default {
   data() {
     return {
       // 记录处于活跃状态的索引值
-      currentIndex: -1
+      currentIndex: -1,
+      // 记录typebar的显示与隐藏
+      show: true
     }
   },
   // 组件挂载完毕，可以发请求了
   mounted() {
-    // 通知vuex发请求，获取数据，存储于仓库中
-    this.$store.dispatch('categoryList')
+    // 通知vuex发请求，获取数据，存储于仓库中，老师把这一步移到了app.vue里面
+    // this.$store.dispatch('categoryList');
+    // 当组件挂载完毕(DOM渲染完毕)，将show改为false
+    // 如果不在home路径中就隐藏
+    if(this.$route.path != '/home') {
+      this.show = false
+    }
   },
   computed: {
     // 当使用这个计算属性也就是这里的categoryList的时候，会自动执行后面的函数
@@ -91,23 +100,19 @@ export default {
     changeIndex: throttle(function(index) {
       this.currentIndex = index
     }, 50),
-    // 监听鼠标离开，还原currentIndex
-    resetIndex() {
-      this.currentIndex = -1
-    },
     // 进行路由跳转的方法
     goSearch(event) {
       // 最好的解决方案：编程式导航 + 事件委派
       // 利用事件委派又存在一些问题：1.如何确定点击的是a标签  2.如何确定点击的是第几级的a标签  3.如何获取参数【1/2/3级分类的产品名字和id】
-
+      console.log(event)
       // 第一个问题：把子节点当中的a标签，加上自定义属性data-categoryname，其余的节点是没有的
       let element = event.target;
       // 获取到当前触发这个事件的节点，带有data-categoryname节点的就是a标签
-      // 节点有一个dataset属性，可以获取节点的自定义属性和属性值，将各个属性结构出来
+      // 节点有一个dataset属性，里面装的就是属性名和id，因此可以获取节点的自定义属性和属性id值，将各个属性结构出来，没有的就是空null
       let {categoryname, category1id, category2id, category3id} = element.dataset;
       // 如果节点有categoryname属性就一定是a标签
       if(categoryname) {
-        // 整理路由跳转参数
+        // 整理路由跳转参数，已经确定是要跳转到search页面，但是要在里面加上categoryName和categoryId作为路由参数传过去
         let location = {name: "Search"};
         let query = {categoryName: categoryname};
         // 一级分类、二级分类、三级分类的a标签
@@ -118,10 +123,23 @@ export default {
         } else {
           query.category3Id = category3id;
         }
-        // 整理完参数，location里面name是跳转到的地址，query是传入的参数
+        // 将query也加入到location对象里，location里面name是跳转到的地址，query是传入的参数，name指向跳转到的路径，路径里面加上query参数，query参数里面是name和id
         location.query = query;
         // 路由跳转
         this.$router.push(location);
+      }
+    },
+    // 展示列表栏
+    showTabNav() {
+      if(this.$route.path != '/home') {
+        this.show = true
+      }
+    },
+    // 隐藏列表栏
+    hiddenTabNav() {
+      this.currentIndex = -1
+      if(this.$route.path != '/home') {
+        this.show = false
       }
     }
   }
@@ -242,6 +260,19 @@ export default {
           background-color: skyblue;
         }
       }
+    }
+    // 过渡动画样式
+    // 过度动画开始状态(进入)
+    .sort-enter {
+      height: 0;
+    }
+    // 过渡动画结束状态(结束)
+    .sort-enter-to {
+      height: 461px;
+    }
+    // 定义动画事件、速率
+    .sort-enter-active {
+      transition: all .5s linear;
     }
   }
 }

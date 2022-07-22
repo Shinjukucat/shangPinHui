@@ -10,7 +10,7 @@ import "nprogress/nprogress.css"
 let request = axios.create({
   // 配置对象
   // 基础路径，发请求时会将 /api 添加到请求路径的前面
-  baseURL: '/api',
+  baseURL: '/mock',
   timeout: 5000
 })
 

@@ -20,6 +20,10 @@ export default {
   components: {
     Header,
     Footer
+  },
+  mounted() {
+    // 通知vuex发请求，获取数据，存储于仓库中，这样就可以实现这条请求只执行一次，不会重复执行，优化项目
+    this.$store.dispatch('categoryList');
   }
 }
 </script>

@@ -14,6 +14,11 @@ import TabNav from '@/components/TabNav';
 // 注册的第一个参数：全局组件的名字，第二个参数：指定是哪个组件
 Vue.component(TabNav.name, TabNav)
 
+// 引入mock数据
+import '@/mock/mockServer'
+
+// 引入swiper样式
+import 'swiper/css/swiper.css'
 new Vue({
   render: h => h(App),
   // 注册路由，因为key和value一致，所以可以省略value

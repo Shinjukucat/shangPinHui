@@ -36,6 +36,7 @@
             type="text"
             id="autocomplete"
             class="input-error input-xxlarge"
+            v-model="keyword"
           />
           <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
             搜索
@@ -50,12 +51,25 @@
 export default {
   data() {
     return {
-      
+      keyword: ''
     }
   },
   methods: {
     goSearch() {
-      this.$router.push('/search')
+      // 路由传递参数
+      // 第一种方式：字符串形式，keyword是params参数，?k= 后面的是query参数
+      // this.$router.push('/search/' + this.keyword + "?k=" + this.keyword.toUpperCase())
+      // 第二种方式：模板字符串形式
+      // this.$router.push(`/search/${this.keyword}?k=${this.keyword.toUpperCase()}`)
+      // 对象形式(最常用的方式)，params传递参数不能路径不能用path，只能用name
+      // this.$router.push({name: 'Search', params: {keyword: this.keyword}, query: {k: this.keyword.toUpperCase()}})
+
+      // 如果有query参数也加到路径里传过去
+      if(this.$route.query) {
+        let location = {name: 'Search', params: {keyword: this.keyword || undefined}};
+        location.query = this.$route.query;
+        this.$router.push(location);
+      }
     }
   }
 };

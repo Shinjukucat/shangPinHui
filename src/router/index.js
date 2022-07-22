@@ -52,10 +52,11 @@ const router = new VueRouter({
       meta: {show: true}
     },
     {
-      path: '/search',
+      // 加上问号代表这条params参数可传可不传
+      path: '/search/:keyword?',
       name: 'Search',
       component: Search,
-      meta: {show: true}
+      meta: {show: true},
     },
     {
       path: '/login',
