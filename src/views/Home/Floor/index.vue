@@ -3,29 +3,11 @@
   <div class="floor">
     <div class="py-container">
       <div class="title clearfix">
-        <h3 class="fl">家用电器</h3>
+        <h3 class="fl">{{list.name}}</h3>
         <div class="fr">
           <ul class="nav-tabs clearfix">
-            <li class="active">
-              <a href="#tab1" data-toggle="tab">热门</a>
-            </li>
-            <li>
-              <a href="#tab2" data-toggle="tab">大家电</a>
-            </li>
-            <li>
-              <a href="#tab3" data-toggle="tab">生活电器</a>
-            </li>
-            <li>
-              <a href="#tab4" data-toggle="tab">厨房电器</a>
-            </li>
-            <li>
-              <a href="#tab5" data-toggle="tab">应季电器</a>
-            </li>
-            <li>
-              <a href="#tab6" data-toggle="tab">空气/净水</a>
-            </li>
-            <li>
-              <a href="#tab7" data-toggle="tab">高端电器</a>
+            <li class="active" >
+              <a href="#tab1" data-toggle="tab" v-for="(nav,index) in list.navList" :key="index">{{nav.text}}</a>
             </li>
           </ul>
         </div>
@@ -35,55 +17,33 @@
           <div class="floor-1">
             <div class="blockgary">
               <ul class="jd-list">
-                <li>节能补贴</li>
-                <li>4K电视</li>
-                <li>空气净化器</li>
-                <li>IH电饭煲</li>
-                <li>滚筒洗衣机</li>
-                <li>电热水器</li>
+                <li v-for="(key, index) in list.keywords" :key="index">{{key}}</li>
               </ul>
-              <img src="./images/floor-1-1.png" />
+              <img :src="list.imgUrl" />
             </div>
             <div class="floorBanner">
-              <div class="swiper-container" id="floor1Swiper">
-                <div class="swiper-wrapper">
-                  <div class="swiper-slide">
-                    <img src="./images/floor-1-b01.png" />
-                  </div>
-                  <!-- <div class="swiper-slide">
-                    <img src="./images/floor-1-b02.png" />
-                  </div>
-                  <div class="swiper-slide">
-                    <img src="./images/floor-1-b03.png" />
-                  </div> -->
-                </div>
-                <!-- 如果需要分页器 -->
-                <div class="swiper-pagination"></div>
-
-                <!-- 如果需要导航按钮 -->
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-              </div>
+              <!-- 轮播图位置 -->
+              <Carousel :list="list.carouselList"></Carousel>
             </div>
             <div class="split">
               <span class="floor-x-line"></span>
               <div class="floor-conver-pit">
-                <img src="./images/floor-1-2.png" />
+                <img :src="list.recommendList[0]" />
               </div>
               <div class="floor-conver-pit">
-                <img src="./images/floor-1-3.png" />
+                <img :src="list.recommendList[1]" />
               </div>
             </div>
             <div class="split center">
-              <img src="./images/floor-1-4.png" />
+              <img :src="list.bigImg" />
             </div>
             <div class="split">
               <span class="floor-x-line"></span>
               <div class="floor-conver-pit">
-                <img src="./images/floor-1-5.png" />
+                <img :src="list.recommendList[2]" />
               </div>
               <div class="floor-conver-pit">
-                <img src="./images/floor-1-6.png" />
+                <img :src="list.recommendList[3]" />
               </div>
             </div>
           </div>
@@ -94,7 +54,28 @@
 </template>
 
 <script>
-export default {};
+export default {
+  props: ['list'],
+  // 这里之所以可以将new Swiper实例放在mounted里面了是因为请求数据操作是在home的index组件里发的，也就是现在这个组件的父组件中发的，父组件拿到所有数据后传给了这个子组件，而且也都遍历完了，也就是说在执行待这一步时组件中的轮播图模块已经完全搭建完毕了
+  mounted() {
+    // let mySwiper = new Swiper (this.$refs.floor1Swiper, {
+    //   autoplay:true, // 自动切换
+    //   loop: true, // 循环模式选项
+    //   // 如果需要分页器
+    //   pagination: {
+    //     el: '.swiper-pagination',
+    //     // 点击小球的时候也能切换图片
+    //     clickable: true
+    //   },
+    //   // 如果需要前进后退按钮
+    //   navigation: {
+    //     nextEl: '.swiper-button-next',
+    //     prevEl: '.swiper-button-prev',
+    //   },
+    // })   
+  },
+
+};
 </script>
 
 <style lang="less" scoped>

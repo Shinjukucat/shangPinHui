@@ -11,8 +11,11 @@ import store from '@/store';
 // 全局组件的引入和注册
 // Tabnav商品分类组件
 import TabNav from '@/components/TabNav';
+// 轮播图组件进行全局注册
+import Carousel from '@/components/Carousel';
 // 注册的第一个参数：全局组件的名字，第二个参数：指定是哪个组件
 Vue.component(TabNav.name, TabNav)
+Vue.component(Carousel.name, Carousel)
 
 // 引入mock数据
 import '@/mock/mockServer'

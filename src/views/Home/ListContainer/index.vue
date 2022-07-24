@@ -4,28 +4,7 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <div class="swiper-container" id="mySwiper">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide" v-for="(carousel) in bannerList" :key="carousel.id">
-              <img :src="carousel.imgUrl" />
-            </div>
-            <!-- <div class="swiper-slide">
-              <img src="./images/banner2.jpg" />
-            </div>
-            <div class="swiper-slide">
-              <img src="./images/banner3.jpg" />
-            </div>
-            <div class="swiper-slide">
-              <img src="./images/banner4.jpg" />
-            </div> -->
-          </div>
-          <!-- 如果需要分页器 -->
-          <div class="swiper-pagination"></div>
-
-          <!-- 如果需要导航按钮 -->
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-button-next"></div>
-        </div>
+        <Carousel :list="bannerList"></Carousel>
       </div>
       <div class="right">
         <div class="news">
@@ -102,37 +81,66 @@
 
 <script>
 import {mapState} from 'vuex'
-// 引入swiper
-import Swiper from 'swiper'
 export default {
   mounted() {
     // 派发actions：通过vuex发送ajax请求，将数据存储到仓库中
     this.$store.dispatch('getBannerList');
     // 这里将new Swiper通过定时器滞后执行，以此来解决结构还没搭建好就new Swiper实例导致不起作用的问题
-    setTimeout(() => {
-      let mySwiper = new Swiper ('.swiper-container', {
-        loop: true, // 循环模式选项
+    // setTimeout(() => {
+    //   let mySwiper = new Swiper ('.swiper-container', {
+    //     autoplay:true, // 自动切换
+    //     loop: true, // 循环模式选项
 
-        // 如果需要分页器
-        pagination: {
-          el: '.swiper-pagination',
-          // 点击小球的时候也能切换图片
-          clickable: true
-        },
+    //     // 如果需要分页器
+    //     pagination: {
+    //       el: '.swiper-pagination',
+    //       // 点击小球的时候也能切换图片
+    //       clickable: true
+    //     },
 
-        // 如果需要前进后退按钮
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-      })        
-    }, 500)
+    //     // 如果需要前进后退按钮
+    //     navigation: {
+    //       nextEl: '.swiper-button-next',
+    //       prevEl: '.swiper-button-prev',
+    //     },
+    //   })        
+    // }, 500)
   },
   computed: {
     ...mapState({
       bannerList: state => state.home.bannerlist
     })
-  }
+  },
+  // watch: {
+  //   // 监听bannerList属性的变换，因为它从无到有数据发生了变化
+  //   bannerList: {
+  //     immediate: true,
+  //     handler(newValue, oldValue) {
+  //       // watch虽然完美地监听到了bannerList属性的变化，也就是说执行new Swiper时bannerList里已经有数据了，但是v-for对其遍历也需要时间数据还没有遍历完成，也就是说此时模块还没有搭建好，轮播图的结构还没有渲染完毕
+  //       // $nextTick: 官方解释:在下次DOM更新循环结束之后执行延迟回调。在修改数据之后立即执行这个方法，获取更新的DOM
+  //       this.$nextTick(() => {
+  //         // 当执行nextTick里面的这个回调函数的时候，就可以保证请求的所有数据都已经请求到了，而且v-for也遍历完了所有的数据。在这里就代表轮播图的结构已经完全有了
+  //         let mySwiper = new Swiper (this.$refs.mySwiper, {
+  //           autoplay:true, // 自动切换
+  //           loop: true, // 循环模式选项
+    
+  //           // 如果需要分页器
+  //           pagination: {
+  //             el: '.swiper-pagination',
+  //             // 点击小球的时候也能切换图片
+  //             clickable: true
+  //           },
+    
+  //           // 如果需要前进后退按钮
+  //           navigation: {
+  //             nextEl: '.swiper-button-next',
+  //             prevEl: '.swiper-button-prev',
+  //           },
+  //         })    
+  //       })
+  //     }
+  //   }
+  // }
 };
 </script>
 

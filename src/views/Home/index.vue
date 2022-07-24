@@ -5,13 +5,13 @@
     <recommend></recommend>
     <rank></rank>
     <like></like>
-    <floor></floor>
-    <floor></floor>
+    <floor v-for="(floor) in floorList" :key="floor.id" :list="floor"></floor>
     <brand></brand>
   </div>
 </template>
 
 <script>
+import {mapState} from 'vuex'
 import ListContainer from '@/views/Home/ListContainer/index.vue'
 import Recommend from '@/views/Home/Recommend/index.vue'
 import Rank from '@/views/Home/Rank/index.vue'
@@ -26,6 +26,15 @@ export default {
     Like,
     Floor,
     Brand
+  },
+  mounted() {
+    // 在home组件里请求floor数据
+    this.$store.dispatch('getFloorList')
+  },
+  computed: {
+    ...mapState({
+      floorList: state => state.home.floorList
+    })
   }
 }
 </script>

@@ -15,3 +15,11 @@ export const reqCategoryList = () => {
 export const reqGetBannerList = () => {
   return mockRequest.get('/banner')
 }
+
+// 封装floor家用电器区域的数据请求
+export const reqFloorList = () => {
+  return mockRequest.get('/floor')
+}
+
+// 封装搜索search模块请求函数
+export const reqSearchList = params => request.post('/list', {data: params})

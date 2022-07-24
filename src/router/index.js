@@ -52,7 +52,7 @@ const router = new VueRouter({
       meta: {show: true}
     },
     {
-      // 加上问号代表这条params参数可传可不传
+      // 加上问号代表这条params参数字段可传可不传
       path: '/search/:keyword?',
       name: 'Search',
       component: Search,
