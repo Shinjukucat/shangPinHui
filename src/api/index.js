@@ -17,7 +17,7 @@ export const reqGetBannerList = () => {
 }
 
 // 封装floor家用电器区域的数据请求
-export const reqFloorList = () => {
+export const reqGetFloorList = () => {
   return mockRequest.get('/floor')
 }
 

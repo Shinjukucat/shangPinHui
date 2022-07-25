@@ -124,6 +124,7 @@ export default {
           query.category3Id = category3id;
         }
         // 将query也加入到location对象里，location里面name是跳转到的地址，query是传入的参数，name指向跳转到的路径，路径里面加上query参数，query参数里面是name和id
+        // 商品的分类参数全部都保存在了query里，搜索关键字在params里
         location.query = query;
         // 路由跳转
         this.$router.push(location);

@@ -66,11 +66,21 @@ export default {
 
       // 如果有query参数也加到路径里传过去
       if(this.$route.query) {
+        // params参数要占位，query不用
         let location = {name: 'Search', params: {keyword: this.keyword || undefined}};
         location.query = this.$route.query;
         this.$router.push(location);
       }
-    }
+      else {
+        let location = {name: 'Search', params: {keyword: this.keyword || undefined}};
+        this.$router.push(location);
+      }
+    },
+  },
+  mounted() {
+    this.$bus.$on('clearKeyword', () => {
+      this.keyword = ''
+    })
   }
 };
 </script>

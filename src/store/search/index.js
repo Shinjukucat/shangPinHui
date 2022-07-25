@@ -19,6 +19,7 @@ const actions = {
 };
 // getters是用来简化数据的
 // 通过getters将以后要在组件中使用的数据进行简化
+// getters将请求到的searchList里面的数据细分出来，这样组件中口可以直接拿到searchList里面的数据
 // 计算属性的意思就是利用已有的属性的属性值计算出一个新的属性，getters的state参数是默认传入的可写可不写，而且getters里面没有模块，所有state都是在一起的
 const getters = {
   goodsList(state) {

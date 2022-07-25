@@ -4,7 +4,7 @@
       <div class="fl key brand">品牌</div>
       <div class="value logos">
         <ul class="logo-list">
-          <li v-for="tradMark in trademarkList" :key="tradMark.tmId">{{tradMark.tmName}}</li>
+          <li v-for="tradMark in trademarkList" :key="tradMark.tmId" @click="tradMarkClick(tradMark)">{{tradMark.tmName}}</li>
         </ul>
       </div>
       <div class="ext">
@@ -16,7 +16,7 @@
       <div class="fl key">{{attr.attrName}}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="(attrValue, item) in attr.attrValueList" :key="item">
+          <li v-for="(attrValue, item) in attr.attrValueList" :key="item" @click="attrValueClick(attr, attrValue)">
             <a>{{attrValue}}</a>
           </li>
         </ul>
@@ -31,8 +31,20 @@ import { mapGetters } from "vuex";
 export default {
   name: "SearchSelector",
   computed: {
+    // 在计算属性中将vuex中两个属性拿到
     // trademarkList是品牌列表，attrsList是品牌的参数详情
     ...mapGetters(['trademarkList', 'attrsList'])
+  },
+  methods: {
+    // 品牌按钮的点击事件
+    //因为点击按钮还要请求相应品牌对应的数据，而请求的参数在父组件里，所以还要将品牌信息传递给父组件，让父组件请求数据
+    tradMarkClick(tradMark) {
+      // 第一个参数是父亲中自定义事件的名字，第二个参数是接收到的传递来的参数
+      this.$emit('tradmarkInfo', tradMark);
+    },
+    attrValueClick(attr, attrValue) {
+      this.$emit('attrInfo', attr, attrValue)
+    }
   }
 };
 </script>

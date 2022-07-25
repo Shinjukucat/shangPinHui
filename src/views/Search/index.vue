@@ -13,39 +13,28 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+            <li class="with-x" v-if="searchFormParams.categoryName">{{searchFormParams.categoryName}}<i @click="removeCategoryName">×</i></li>
+            <li class="with-x" v-if="searchFormParams.keyword">{{searchFormParams.keyword}}<i @click="removeKeyword">×</i></li>
+            <li class="with-x" v-if="searchFormParams.trademark">{{searchFormParams.trademark.split(':')[1]}}<i @click="removeTradmark">×</i></li>
+            <li class="with-x" v-for="(attr, index) in searchFormParams.props" :key="index">{{attr.split(':')[1]}}<i @click="removeAttr(index)">×</i></li>
           </ul>
         </div>
 
         <!--商品参数表格组件-->
-        <SearchSelector />
+        <!-- 通过添加自定义事件实现字传父 -->
+        <SearchSelector @tradmarkInfo = 'tradmarkInfo' @attrInfo = 'attrInfo' />
 
-        <!--商品带图片的展示-->
+        <!--order参数所在部分 商品带图片的展示-->
         <div class="details clearfix">
           <!-- 综合、销量... -->
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{active: isOne}" @click="changeOrder('1')">
+                  <a>综合<span v-show="isAsc && isOne">⬆</span><span v-show="isDesc && isOne">⬇</span></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
-                </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li :class="{active: isTwo}" @click="changeOrder('2')">
+                  <a>价格<span v-show="isAsc && isTwo">⬆</span><span v-show="isDesc && isTwo">⬇</span></a>
                 </li>
               </ul>
             </div>
@@ -141,8 +130,8 @@ export default {
         categoryName: "",
         // 搜索的关键字
         keyword: "",
-        // 排序
-        order: "",
+        // 商品排序 默认是综合降序 1综合 2价格 asc升序 desc降序
+        order: "1:desc",
         pageNo: 1,
         pageSize: 10,
         // 平台售卖属性带的参数
@@ -164,7 +153,8 @@ export default {
     // this.searchFormParams.categoryName = this.$route.query.categoryName;
     // this.searchFormParams.keyword = this.$route.query.keyword;
     // Object.assign写法,ES4新增的写法,合并对象
-    // 将括号中的对象进行合并(将拥有相同属性名的属性值合并
+    // 这个函数会在mounted函数执行之前执行，将括号中的对象进行合并(将拥有相同属性名的属性值合并)
+    //在发送请求之前，把接口需要传递的参数，进行整理
     Object.assign(this.searchFormParams, this.$route.query, this.$route.params)
   },
   mounted() {
@@ -179,13 +169,100 @@ export default {
     // })
     // mapGetters里面传递的是数组，因为getters计算是没有划分模块的
     ...mapGetters(["goodsList"]),
+    // 判断order字符串中是否有1/2，以此来给综合/价格加背景
+    isOne() {
+      // 没有1就返回false
+      return this.searchFormParams.order.indexOf('1') != -1;
+    },
+    isTwo() {
+      return this.searchFormParams.order.indexOf('2') != -1;
+    },
+    isAsc() {
+      // 没有asc就返回false
+      return this.searchFormParams.order.indexOf('asc') != -1;
+    },
+    isDesc() {
+      return this.searchFormParams.order.indexOf('desc') != -1;
+    }
   },
   methods: {
     // 发送请求的方法，把发送请求的方法写在这里，就可以通过多次调用方法来多次请求数据了，而且mounted里面也可以调用这个方法进行初始的请求
     getSearchDate() {
       this.$store.dispatch("getSearchList", this.searchFormParams);
     },
+    removeCategoryName() {
+      this.searchFormParams.categoryName = '';
+      this.searchFormParams.category1Id = '';
+      this.searchFormParams.category2Id = '';
+      this.searchFormParams.category3Id = '';
+      this.getSearchDate();
+      // 点击叉号关闭面包屑标签后，地址栏的参数并没有改，通过路由跳转跳转到默认路径(但是如果有params参数时需要保留params参数，因为标签只是query的参数，点叉号只是想清除query参数)
+      // this.$router.push('Search')
+      if(this.$route.params)
+        this.$router.push({name: 'Search', params: this.$route.params})
+      else
+        this.$router.push('Search')
+    },
+    removeKeyword() {
+      this.searchFormParams.keyword = '';
+      // 通知兄弟组件清除搜索框里的keyword
+      this.$bus.$emit('clearKeyword')
+      this.getSearchDate();
+      if(this.$route.query)
+        this.$router.push({name: 'Search', query: this.$route.query})
+      else
+        this.$router.push('Search')
+    },
+    removeTradmark() {
+      this.searchFormParams.trademark = '';
+      this.getSearchDate();
+    },
+    removeAttr(index) {
+      this.searchFormParams.props.splice(index, 1)
+      this.getSearchDate()
+    },
+    // 子给父通信用的是自定义事件
+    tradmarkInfo(tradMark) {
+      // console.log(tradMark)
+      this.searchFormParams.trademark = `${tradMark.tmId}:${tradMark.tmName}`;
+      this.getSearchDate();
+    },
+    attrInfo(attr, attrValue) {
+      // 服务器要求传递的参数的格式： ['属性ID:属性值:属性名']
+      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
+      // == -1说明props数组里面没有没有现在点的这个属性
+      if(this.searchFormParams.props.indexOf(props) == -1)
+        this.searchFormParams.props.push(props);
+      this.getSearchDate()
+    },
+    // 综合和价格按钮的点击事件
+    changeOrder(flag) {
+      // flag形参，它是一个标记，代表用户点击的是综合(1)，还是价格(2)
+      let originOrder = this.searchFormParams.order;
+      let originFlag = originOrder.split(':')[0];
+      let originSort = originOrder.split(':')[1];
+      let nowOrder = '';
+      if(flag === originFlag)
+        nowOrder = `${originFlag}:${originSort === 'asc' ? 'desc' : 'asc'}`;
+      else
+        nowOrder = `${flag}:${"desc"}`
+      this.searchFormParams.order = nowOrder;
+      this.getSearchDate()
+    }
   },
+  watch: {
+    // 通过监听路由的变化来请求数据从而刷新页面
+    $route(newValue, oldValue) {
+      // 再次发送请求之前请求的参数也要发生变化
+      Object.assign(this.searchFormParams, this.$route.query, this.$route.params);
+      // 路由发生变化了，说明点击了新的参数，再次发送请求
+      this.getSearchDate();
+      // 在一次请求完毕后，将这次请求的category1、2、3Id的值置空，以免影响下一次的请求，因为如果不置空的话这一次的id值如果不背覆盖会携带到下一次的搜索
+      this.searchFormParams.category1Id = '';
+      this.searchFormParams.category2Id = '';
+      this.searchFormParams.category3Id = ''
+    }
+  }
 };
 </script>
 

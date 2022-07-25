@@ -11,8 +11,10 @@ import store from '@/store';
 // 全局组件的引入和注册
 // Tabnav商品分类组件
 import TabNav from '@/components/TabNav';
+import Carousel from '@/components/Carousel';
 // 注册的第一个参数：全局组件的名字，第二个参数：指定是哪个组件
 Vue.component(TabNav.name, TabNav)
+Vue.component(Carousel.name, Carousel)
 
 // 引入mock数据
 import '@/mock/mockServer'
@@ -21,6 +23,10 @@ import '@/mock/mockServer'
 import 'swiper/css/swiper.css'
 new Vue({
   render: h => h(App),
+  // 配置全局总线$bus
+  beforeCreate() {
+    Vue.prototype.$bus = this
+  },
   // 注册路由，因为key和value一致，所以可以省略value
   // 注册完路由后，路由组件和非路由组件身上都会具有$route和$router属性
   router,
