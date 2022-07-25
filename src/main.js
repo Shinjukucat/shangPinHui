@@ -3,18 +3,20 @@ import App from './App.vue'
 // 引入路由
 import router from '@/router/index'
 // 引入store
-import store from '@/store';
+import store from '@/store'
 
 // 阻止显示当前生成模式的代码
 // Vue.config.productionTip = false
 
 // 全局组件的引入和注册
 // Tabnav商品分类组件
-import TabNav from '@/components/TabNav';
-import Carousel from '@/components/Carousel';
+import TabNav from '@/components/TabNav'
+import Carousel from '@/components/Carousel'
+import Pagination from '@/components/Pagination'
 // 注册的第一个参数：全局组件的名字，第二个参数：指定是哪个组件
 Vue.component(TabNav.name, TabNav)
 Vue.component(Carousel.name, Carousel)
+Vue.component(Pagination.name, Pagination)
 
 // 引入mock数据
 import '@/mock/mockServer'

@@ -23,7 +23,7 @@
                 <li
                   v-for="(keyword, index) in floorInfo.keywords"
                   :key="index"
-                  :style="{ color: index % 2 != 0 ? 'cyan' : 'black' }"
+                 
                 >
                   {{ keyword }}
                 </li>
