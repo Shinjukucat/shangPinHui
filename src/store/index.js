@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import home from './home'
 import search from './search'
+import detail from './detail'
 
 // 注册vuex
 Vue.use(Vuex);
@@ -11,6 +12,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     home,
-    search
+    search,
+    detail
   }
 })

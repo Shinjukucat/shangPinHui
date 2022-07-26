@@ -22,4 +22,7 @@ export const reqGetFloorList = () => {
 }
 
 // 封装搜索search模块请求函数
-export const reqSearchList = params => request.post('/list', {data: params})
+export const reqSearchList = data => request.post('/list', data)
+
+// 封装商品详情模块的数据请求函数
+export const reqDetailList = params => request.get(`/item/${params}`)

@@ -28,7 +28,7 @@ export default {
       handler() {
         //只能监听到数据已经有了，但是v-for动态渲染结构我们还是没有办法确定的，因此还是需要用nextTick
         this.$nextTick(() => {
-          var mySwiper = new Swiper(this.$refs.swiper, {
+          new Swiper(this.$refs.swiper, {
             // 自动播放
             autoplay: true,
             loop: true,

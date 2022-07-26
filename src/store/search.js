@@ -30,7 +30,10 @@ const getters = {
   },
   attrsList(state) {
     return state.searchList.attrsList
-  }
+  },
+  total(state) {
+    return state.searchList.total
+  },
 };
 
 export default {

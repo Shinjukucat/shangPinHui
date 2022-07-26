@@ -21,7 +21,7 @@
         </div>
 
         <!--商品参数表格组件-->
-        <!-- 通过添加自定义事件实现字传父 -->
+        <!-- 通过添加自定义事件实现子传父 -->
         <SearchSelector @tradmarkInfo = 'tradmarkInfo' @attrInfo = 'attrInfo' />
 
         <!--order参数所在部分 商品带图片的展示-->
@@ -45,9 +45,9 @@
               <li class="yui3-u-1-5" v-for="good in goodsList" :key="good.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="item.html" target="_blank"
-                      ><img :src="good.defaultImg"
-                    /></a>
+                    <router-link :to="`/detail/${good.id}`">
+                      <img :src="good.defaultImg"/>
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -79,7 +79,8 @@
             </ul>
           </div>
           <!-- 分页区域 -->
-          <pagination></pagination>
+          <!-- 给自己封装的分页器组件传参，continues是中间的页数的个数 -->
+          <Pagination :pageNo="searchFormParams.pageNo" :pageSize="searchFormParams.pageSize" :total="total" :continues="5" @getPageNo="getPageNo"></Pagination>
         </div>
       </div>
     </div>
@@ -105,7 +106,7 @@ export default {
         // 商品排序 默认是综合降序 1综合 2价格 asc升序 desc降序
         order: "1:desc",
         pageNo: 1,
-        pageSize: 10,
+        pageSize: 3,
         // 平台售卖属性带的参数
         props: [],
         // 牌子
@@ -140,7 +141,7 @@ export default {
     //   goodsList: state => state.search.searchList.goodsList,
     // })
     // mapGetters里面传递的是数组，因为getters计算是没有划分模块的
-    ...mapGetters(["goodsList"]),
+    ...mapGetters(["goodsList", "total", "totalSize"]),
     // 判断order字符串中是否有1/2，以此来给综合/价格加背景
     isOne() {
       // 没有1就返回false
@@ -220,6 +221,11 @@ export default {
         nowOrder = `${flag}:${"desc"}`
       this.searchFormParams.order = nowOrder;
       this.getSearchDate()
+    },
+    // 获得当前点击的页码数的自定义事件
+    getPageNo(pageNo) {
+      this.searchFormParams.pageNo = pageNo;
+      this.getSearchDate();
     }
   },
   watch: {

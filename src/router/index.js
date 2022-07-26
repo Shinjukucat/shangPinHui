@@ -1,13 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import routes from '@/router/routes'
 
 // 使用插件
 Vue.use(VueRouter);
 // 引入路由组件
-const Home = () => import('@/views/Home')
-const Search = () => import('@/views/Search')
-const Login = () => import('@/views/Login')
-const Register = () => import('@/views/Register')
+
  
 // 解决多次跳转报错的问题
 // 需要重写VueRouter.prototype原型对象身上的push|replace方法
@@ -39,38 +37,12 @@ VueRouter.prototype.replace = function(location, resolve, reject) {
 
 // 配置路由
 const router = new VueRouter({
-  routes: [
-    {
-      path: '/',
-      redirect: '/home',
-    },
-    {
-      path: '/home',
-      name: 'Home',
-      component: Home,
-      // 配置路由原信息 meta ,里面放key: value
-      meta: {show: true}
-    },
-    {
-      // params参数要占位，这里用来传递搜素的关键字，加上问号代表这条params参数可传可不传
-      path: '/search/:keyword?',
-      name: 'Search',
-      component: Search,
-      meta: {show: true},
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login,
-      meta: {show: false}
-    },
-    {
-      path: '/register',
-      name: 'Register',
-      component: Register,
-      meta: {show: false}
-    }
-  ],
+  // ES6简化写法
+  routes,
+  // v-router滚动行为 在这里解决路由跳转后滚动条位置不在顶部的问题
+  scrollBehavior(to, from, savedPosition) {
+    return {y: 0}
+  },
   mode: 'history'
 })
 
