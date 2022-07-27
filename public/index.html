@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <!-- <link rel="stylesheet" href="./reset.css"> -->
-    <!-- / 前面千万不要加 . -->
+    <!-- 之前之所以会报错是因为reset.css文件不在哪个文件夹里，而我使用了 ./ 在当前文件夹下找它，所以会有bug，直接用 / 在根目录下找就可以了 -->
     <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="https://at.alicdn.com/t/font_2758111_9hehey1sgko.css">
     <title><%= htmlWebpackPlugin.options.title %></title>

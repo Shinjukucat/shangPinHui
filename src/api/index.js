@@ -26,3 +26,9 @@ export const reqSearchList = data => request.post('/list', data)
 
 // 封装商品详情模块的数据请求函数
 export const reqDetailList = params => request.get(`/item/${params}`)
+
+// 添加或更新购物车数据的请求函数/api/cart/addToCart/{ skuId }/{ skuNum }
+export const reqAddUpdataShopcart = (skuId, skuNum) => request.post(`/cart/addToCart/${skuId}/${skuNum}`)
+
+// 封装获取购物车列表的请求函数
+export const reqShopcartList = () => request.get('/cart/cartList')

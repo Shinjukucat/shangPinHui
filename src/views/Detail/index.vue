@@ -83,12 +83,13 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt" />
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum" @change="changeMount" />
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum > 1 ? skuNum-- : skuNum = 1">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <!-- 这里在加入购物车跳转路由之前，要发送请求将商品信息上传服务器返回添加是否添加成功，服务器进行相应的存储 -->
+                <a href="javascript:" @click="addShopcart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -335,7 +336,12 @@ import {mapGetters} from 'vuex';
 
 export default {
   name: "Detail",
-
+  data() {
+    return {
+      // 添加到购物车的商品数量
+      skuNum: 1
+    }
+  },
   components: {
     ImageList,
     Zoom,
@@ -358,9 +364,41 @@ export default {
       valueList.forEach(item => {
         item.isChecked = 0
       });
-      value.isChecked = 1
+      value.isChecked = 1;
+    },
+    changeMount(event) {
+      // 这个事件的所有相关信息
+      // console.log(event)
+      // 任何非纯数字形式 * 1 得到的都是NaN
+      let mount = event.target.value * 1;
+      // 处理非法输入
+      if(isNaN(mount) || mount < 1)
+        this.skuNum = 1;
+      else
+        this.skuNum = parseInt(mount);
+    },
+    // 添加购物车
+    async addShopcart() {
+      // 点击添加购物车需要进行的操作：
+      // 1. 发请求 —— 发送将产品添加到购物车列表里的请求，携带的参数告诉服务器添加的是哪件商品，也就是把商品存入购物车数据库的请求
+      // 2. 服务器存储成功，跳转到添加成功的页面
+      // 3. 存储失败，反馈用户存储失败
+      // 这里调用actions函数时，返回的值还是一个Promise，用async和await对其进行简化
+      // 这里的try和catch可以检测到返回的是成功还是失败，也就是说他可以知道Promise返回的是success还是error
+      try {
+        // 成功执行一下语句
+        await this.$store.dispatch("addUpdataShopcart", {skuId: this.$route.params.skuId, skuNum: this.skuNum});
+        // 方法一：将产品信息和产品个数都作为query参数传递过去，路径会有点复杂，但是不少网站就是这么用的
+        // this.$router.push({name: 'AddCartSuccess', query: {skuInfo: this.skuInfo, skuNum: this.skuNum}});
+        // 方法二：用sessionStorage会话存储（会话存储只能存储字符串），skuNum数据较简单用query传参就可以了
+        sessionStorage.setItem("SKUINFO", JSON.stringify(this.skuInfo));
+        this.$router.push({name: 'AddCartSuccess', query: {skuNum: this.skuNum}})
+      } catch (error) {
+        // 失败执行以下语句
+        alert(error.message);
+      }
     }
-  }
+  }, 
 };
 </script>
 

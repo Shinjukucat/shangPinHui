@@ -3,6 +3,8 @@ const Search = () => import('@/views/Search')
 const Login = () => import('@/views/Login')
 const Register = () => import('@/views/Register')
 const Detail = () => import('@/views/Detail')
+const AddCartSuccess = () => import('@/views/AddCartSuccess')
+const ShopCart = () => import('@/views/ShopCart')
 
 export default [
   {
@@ -13,7 +15,7 @@ export default [
     path: '/home',
     name: 'Home',
     component: Home,
-    // 配置路由原信息 meta ,里面放key: value
+    // 配置路由原信息 meta ,里面放key: value，这里是的show控制的是底部footer的显示与隐藏
     meta: {show: true}
   },
   {
@@ -40,6 +42,18 @@ export default [
     path: '/detail/:skuId',
     name: 'Detail',
     component: Detail,
+    meta: {show: false}
+  },
+  {
+    path: '/addcartsuccess',
+    name: 'AddCartSuccess',
+    component: AddCartSuccess,
+    meta: {show: false}
+  },
+  {
+    path: '/shopcart',
+    name: 'ShopCart',
+    component: ShopCart,
     meta: {show: false}
   }
 ]

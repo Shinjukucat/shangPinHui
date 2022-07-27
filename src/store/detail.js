@@ -1,14 +1,17 @@
-import {reqDetailList} from '@/api/index'
+import {reqDetailList, reqAddUpdataShopcart} from '@/api/index'
+// 封装一个用户零时身份uuid，生成一次后保存就不能再变了
+import {getUUID} from '@/utils/uuid_token'
 
 const state = {
   // 存储商品详情的数据
-  detailList: {}
+  detailList: {},
+  uuid_token: getUUID()
 }
 
 const mutations = {
   DETAILLIST(state, detaillist) {
     state.detailList = detaillist
-  }
+  },
 }
 
 const actions = {
@@ -16,6 +19,15 @@ const actions = {
     let result = await reqDetailList(params);
     if(result.code === 200)
       commit('DETAILLIST', result.data)
+  },
+  // 返回的是添加购物车成功or失败，{skuId, skuNum}这里将传过来的对象里面的属性解构出来
+  // 这里因为返回的只是添加成功或失败的结果。没有其他多余的data，所以没必要在仓库中存储什么数据
+  async addUpdataShopcart({commit}, {skuId, skuNum}) {
+    let result = await reqAddUpdataShopcart(skuId, skuNum);
+    if(result.code === 200)
+      return 'ok';
+    else
+      return Promise.reject(new Error('fasile'));
   }
 }
 
@@ -32,7 +44,7 @@ const getters = {
   },
   spuSaleAttrList(state) {
     return state.detailList.spuSaleAttrList || []
-  }
+  },
 }
 
 export default {
