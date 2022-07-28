@@ -133,7 +133,7 @@ export default {
   mounted() {
     // 这样把请求数据直接放在mounted里面只能执行一次，但是搜索页面肯定是需要多次发送请求的，所以这里用shop_b的方法
     // this.$store.dispatch("getSearchList", {});
-    this.getSearchDate();
+    this.getSearchData();
   },
   computed: {
     // ...mapState({
@@ -160,7 +160,7 @@ export default {
   },
   methods: {
     // 发送请求的方法，把发送请求的方法写在这里，就可以通过多次调用方法来多次请求数据了，而且mounted里面也可以调用这个方法进行初始的请求
-    getSearchDate() {
+    getSearchData() {
       this.$store.dispatch("getSearchList", this.searchFormParams);
     },
     removeCategoryName() {
@@ -168,7 +168,7 @@ export default {
       this.searchFormParams.category1Id = '';
       this.searchFormParams.category2Id = '';
       this.searchFormParams.category3Id = '';
-      this.getSearchDate();
+      this.getSearchData();
       // 点击叉号关闭面包屑标签后，地址栏的参数并没有改，通过路由跳转跳转到默认路径(但是如果有params参数时需要保留params参数，因为标签只是query的参数，点叉号只是想清除query参数)
       // this.$router.push('Search')
       if(this.$route.params)
@@ -180,7 +180,7 @@ export default {
       this.searchFormParams.keyword = '';
       // 通知兄弟组件清除搜索框里的keyword
       this.$bus.$emit('clearKeyword')
-      this.getSearchDate();
+      this.getSearchData();
       if(this.$route.query)
         this.$router.push({name: 'Search', query: this.$route.query})
       else
@@ -188,17 +188,17 @@ export default {
     },
     removeTradmark() {
       this.searchFormParams.trademark = '';
-      this.getSearchDate();
+      this.getSearchData();
     },
     removeAttr(index) {
       this.searchFormParams.props.splice(index, 1)
-      this.getSearchDate()
+      this.getSearchData()
     },
     // 子给父通信用的是自定义事件
     tradmarkInfo(tradMark) {
       // console.log(tradMark)
       this.searchFormParams.trademark = `${tradMark.tmId}:${tradMark.tmName}`;
-      this.getSearchDate();
+      this.getSearchData();
     },
     attrInfo(attr, attrValue) {
       // 服务器要求传递的参数的格式： ['属性ID:属性值:属性名']
@@ -206,7 +206,7 @@ export default {
       // == -1说明props数组里面没有没有现在点的这个属性
       if(this.searchFormParams.props.indexOf(props) == -1)
         this.searchFormParams.props.push(props);
-      this.getSearchDate()
+      this.getSearchData()
     },
     // 综合和价格按钮的点击事件
     changeOrder(flag) {
@@ -220,12 +220,12 @@ export default {
       else
         nowOrder = `${flag}:${"desc"}`
       this.searchFormParams.order = nowOrder;
-      this.getSearchDate()
+      this.getSearchData()
     },
     // 获得当前点击的页码数的自定义事件
     getPageNo(pageNo) {
       this.searchFormParams.pageNo = pageNo;
-      this.getSearchDate();
+      this.getSearchData();
     }
   },
   watch: {
@@ -234,7 +234,7 @@ export default {
       // 再次发送请求之前请求的参数也要发生变化
       Object.assign(this.searchFormParams, this.$route.query, this.$route.params);
       // 路由发生变化了，说明点击了新的参数，再次发送请求
-      this.getSearchDate();
+      this.getSearchData();
       // 在一次请求完毕后，将这次请求的category1、2、3Id的值置空，以免影响下一次的请求，因为如果不置空的话这一次的id值如果不背覆盖会携带到下一次的搜索
       this.searchFormParams.category1Id = '';
       this.searchFormParams.category2Id = '';
