@@ -13,7 +13,7 @@
       <div class="cart-body">
         <ul class="cart-list" v-for="shop in shopcartList" :key="shop.id">
           <li class="cart-list-con1">
-            <input type="checkbox" name="chk_list" :checked="shop.isChecked == 1" />
+            <input type="checkbox" name="chk_list" :checked="shop.isChecked == 1" @change="changeCheckedStatus(shop.skuId, $event)" />
           </li>
           <li class="cart-list-con2">
             <img :src="shop.imgUrl" />
@@ -25,21 +25,22 @@
             <span class="price">{{shop.skuPrice + '.00'}}</span>
           </li>
           <li class="cart-list-con5">
-            <a href="javascript:void(0)" class="mins">-</a>
+            <a href="javascript:void(0)" class="mins" @click="changeNum('cut', -1, shop)">-</a>
             <input
               autocomplete="off"
               type="text"
               :value="shop.skuNum"
               minnum="1"
               class="itxt"
+              @change="changeNum('change', $event.target.value * 1, shop)"
             />
-            <a href="javascript:void(0)" class="plus">+</a>
+            <a href="javascript:void(0)" class="plus" @click="changeNum('add', 1, shop)">+</a>
           </li>
           <li class="cart-list-con6">
             <span class="sum">{{shop.skuPrice * shop.skuNum + '.00'}}</span>
           </li>
           <li class="cart-list-con7">
-            <a href="#none" class="sindelet">删除</a>
+            <a href="#none" class="sindelet" @click="deleteShop(shop)">删除</a>
             <br />
             <a href="#none">移到收藏</a>
           </li>
@@ -48,11 +49,11 @@
     </div>
     <div class="cart-tool">
       <div class="select-all">
-        <input class="chooseAll" type="checkbox" :checked="isAllChecked" />
+        <input class="chooseAll" type="checkbox" :checked="isAllChecked && shopcartList.length > 0" @click="changeAllShopStatus($event)" />
         <span>全选</span>
       </div>
       <div class="option">
-        <a href="#none">删除选中的商品</a>
+        <a @click="deleteAllShop">删除选中的商品</a>
         <a href="#none">移到我的关注</a>
         <a href="#none">清除下柜商品</a>
       </div>
@@ -71,6 +72,9 @@
 </template>
 
 <script>
+// import _ from 'lodash'
+// 按需引入
+import throttle from 'lodash/throttle'
 import {mapGetters} from 'vuex'
 export default {
   name: "ShopCart",
@@ -80,6 +84,70 @@ export default {
   methods: {
     getShopcartData() {
       this.$store.dispatch('getShopcartList')
+    },
+    // 商品数量的改变，记住每一次修改都是要发送请求的，这样这个商品数量才是真正的修改，如果点的太快服务器翻译不过来的话，商品数量会为负，所以加上节流
+     changeNum: throttle(async function(type, disNum, shop){
+      // 三个改变商品数量的事件使用同一个方法，因为都是调用同一个actions
+      // type用来区分三个不同的改变，disNum显示改变量，shop显示点击的是哪个商品
+      // console.log(type, disNum, shop)
+      switch(type) {
+        case 'add':
+          disNum = 1;
+          break;
+        case 'cut':
+          shop.skuNum > 1 ? disNum = -1 : disNum = 0;
+          break;
+        case 'change':
+          // if(isNaN(disNum) || disNum < 1)
+          //   disNum = 0;
+          // else 
+          //   disNum = parseInt(disNum) - shop.skuNum;
+          disNum = isNaN(disNum) || disNum < 1 ? 0 : parseInt(disNum) - shop.skuNum
+      }
+      try {
+        // await这里用来等待服务器返回数据 await(async wait)异步等待
+        await this.$store.dispatch('addUpdataShopcart', {skuId: shop.skuId, skuNum: disNum});
+        this.getShopcartData()
+      } catch (error) {
+      }
+    },1000),
+    // 删除商品
+    async deleteShop(shop) {
+      try {
+        await this.$store.dispatch('deleteShop', shop.skuId);
+        this.getShopcartData()
+      } catch (error) {
+        
+      }
+    },
+    // 切换商品选中状态
+    async changeCheckedStatus(skuId, event) {
+      try {
+        // $event.target.checked 拿到的勾选状态返回值是bool值，将他改为字符串用于传参
+        let isChecked = event.target.checked ? '1' : '0';
+        await this.$store.dispatch('changeChecked', {skuId: skuId, isChecked: isChecked});
+      } catch (error) {
+        
+      }
+    },
+    // 删除已选中的商品
+    async deleteAllShop() {
+      try {
+        await this.$store.dispatch('deleteAllShop');
+        this.getShopcartData()
+      } catch (error) {
+        alert(error.message)
+      }
+    },
+    // 全选框，修改所有商品的选中状态
+    async changeAllShopStatus(event) {
+      try {
+        let isAllChecked = event.target.checked ? '1' : '0'
+        await this.$store.dispatch('changeAllChecked', isAllChecked)
+        this.getShopcartData()
+      } catch (error) {
+        alert(error.message)
+      }
     }
   },
   computed: {

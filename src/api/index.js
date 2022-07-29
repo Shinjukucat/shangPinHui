@@ -32,3 +32,9 @@ export const reqAddUpdataShopcart = (skuId, skuNum) => request.post(`/cart/addTo
 
 // 封装获取购物车列表的请求函数
 export const reqShopcartList = () => request.get('/cart/cartList')
+
+// 封装删除商品的请求函数
+export const reqDeleteShop = (skuId) => request.delete(`/cart/deleteCart/${skuId}`)
+
+// 封装切换商品选中状态的请求函数
+export const reqChangeCheckedStatus = (skuId, isChecked) => request.get(`/cart/checkCart/${skuId}/${isChecked}`)
