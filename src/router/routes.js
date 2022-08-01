@@ -5,6 +5,7 @@ const Register = () => import('@/views/Register')
 const Detail = () => import('@/views/Detail')
 const AddCartSuccess = () => import('@/views/AddCartSuccess')
 const ShopCart = () => import('@/views/ShopCart')
+const Trade = () => import('@/views/Trade')
 
 export default [
   {
@@ -54,6 +55,12 @@ export default [
     path: '/shopcart',
     name: 'ShopCart',
     component: ShopCart,
+    meta: {show: false}
+  },
+  {
+    path: '/trade',
+    name: 'Trade',
+    component: Trade,
     meta: {show: false}
   }
 ]

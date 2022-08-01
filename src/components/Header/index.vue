@@ -6,9 +6,13 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
-            <router-link to="/login">请登录</router-link>
-            <router-link to="/register" class="register">免费注册</router-link>
+          <p v-if="! userName">
+            <router-link to="/login"><p>请登录</p></router-link>
+            <router-link to="/register" class="register"><p>免费注册</p></router-link>
+          </p>
+          <p v-else>
+            <i>{{userName}}</i>
+            <i class="register" @click="loginout">退出登录</i>
           </p>
         </div>
         <div class="typeList">
@@ -76,11 +80,27 @@ export default {
         this.$router.push(location);
       }
     },
+    // 退出登录按钮
+    async loginout() {
+      try {
+        await this.$store.dispatch('commitLoginout');
+        // 如果退出成功，跳转到home页面
+        this.$router.push('/home')
+      } catch (error) {
+        alert(error.message)
+      }
+    }
   },
   mounted() {
     this.$bus.$on('clearKeyword', () => {
       this.keyword = ''
     })
+  },
+  computed: {
+    // 查看此时仓库有没有用户名
+    userName() {
+      return this.$store.state.user.userInfo.name
+    },
   }
 };
 </script>

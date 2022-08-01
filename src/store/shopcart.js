@@ -1,7 +1,7 @@
 import {reqShopcartList, reqDeleteShop, reqChangeCheckedStatus} from '@/api/index'
 import { reject } from 'lodash'
 const state = {
-  shopcartList: []
+  shopcartList: ['']
 }
 
 const mutations = {
