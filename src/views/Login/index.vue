@@ -89,7 +89,17 @@
             await this.$store.dispatch('postLogin', this.loginForm);
           // 我下面这里的想法是将token保存在浏览器里，通过浏览器来拿到token值，规范写法是将这条语句写在utils里面，因为它属于一个共用功能
           // window.localStorage.setItem('token', this.$store.state.user.token)
-          this.$router.push('/home')
+          // 在P105要求在未登录状态点击了不能去的路由后跳转到登录界面完成登录后还需要跳转到之前无法访问的那个页面，所以，这里需要改进一下
+          // this.$router.push('/home')
+          // 写法一:
+          // if(this.$route.query.redirect) {
+          //   this.$router.push(this.$route.query.redirect)
+          // } else {
+          //   this.$router.push('/home')
+          // }
+          // 简单写法:
+          let toPath = this.$route.query.redirect || '/home';
+          this.$router.push(toPath)
         } catch (error) {
           alert(error.message)
         }
