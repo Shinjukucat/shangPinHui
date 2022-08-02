@@ -6,6 +6,11 @@ const Detail = () => import('@/views/Detail')
 const AddCartSuccess = () => import('@/views/AddCartSuccess')
 const ShopCart = () => import('@/views/ShopCart')
 const Trade = () => import('@/views/Trade')
+const Pay = () => import('@/views/Pay')
+const PaySuccess = () => import('@/views/PaySuccess')
+const Center = () => import('@/views/Center')
+const myOrder = () => import('@/views/Center/myOrder')
+const groupOrder = () => import('@/views/Center/groupOrder')
 
 export default [
   {
@@ -61,6 +66,67 @@ export default [
     path: '/trade',
     name: 'Trade',
     component: Trade,
-    meta: {show: false}
+    meta: {show: false},
+    // trade页面的路由独享守卫
+    beforeEnter: (to, from, next) => {
+      // 如果从购物车来，直接放行
+      if(from.path === '/shopcart') {
+        next()
+      } else {
+        // next(false)好像不太支持了官方
+        // 如果不是从购物车页面来的，那从哪来回哪去
+        next(false)
+        // next(from.path)
+      }
+    }
+  },
+  {
+    path: '/pay',
+    name: 'Pay',
+    component: Pay,
+    meta: {show: false},
+    beforeEnter: (to, from, next) => {
+      if(from.path === '/trade') {
+        next()
+      } else {
+        next(false)
+        // next(from.path)
+      }
+    }
+  },
+  {
+    path: '/paysuccess',
+    name: 'PaySuccess',
+    component: PaySuccess,
+    meta: {show: false},
+    beforeEnter: (to, from, next) => {
+      if(from.path === '/pay') {
+        next()
+      } else {
+        next(false)
+      }
+    }
+  },
+  {
+    // 个人中心的一级路由
+    path: '/center',
+    name: 'Center',
+    component: Center,
+    meta: {show: false},
+    children: [
+      {
+        path: '/center',
+        redirect: '/center/myorder'
+      },
+      {
+        path: 'myorder',
+        component: myOrder
+      },
+      {
+        // 对二级路由做个重定向
+        path: 'grouporder',
+        component: groupOrder
+      }
+    ]
   }
 ]

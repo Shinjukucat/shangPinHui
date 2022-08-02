@@ -59,3 +59,15 @@ export const reqUserAddress = () => request.get('/user/userAddress/auth/findUser
 
 // 获取订单清单信息接口函数
 export const reqOrderInfo = () => request.get('/order/auth/trade')
+
+// 提交订单的接口函数
+export const reqCommitOrder = (tradeNo, data) => request.post(`/order/auth/submitOrder?tradeNo=${tradeNo}`, {data: data})
+
+// 获取订单支付信息的接口函数
+export const reqOrderPayment = (orderId) => request.get(`/payment/weixin/createNative/${orderId}`)
+
+// 查询订单支付状态的接口函数
+export const reqOrderPayStatus = (orderId) => request.get(`/payment/weixin/queryPayStatus/${orderId}`)
+
+// 个人中心的查询订单列表的接口函数
+export const reqOrderList = (page, limit) => request.get(`/order/auth/${page}/${limit}`)

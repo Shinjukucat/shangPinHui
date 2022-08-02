@@ -70,19 +70,21 @@ router.beforeEach(async (to, from, next) => {
         }
     }
   } else {
-    // 没有登录的情况
+    // 没有登录的情况  未登录时，不能去交易相关的界面、不能去支付相关的界面、不能去个人中心，若在未登录情况下访问这些页面应重定向到登录页面
+    // 拿到当前想要访问的路径
+    let toPath = to.path;
+    // indexOf是检查前面的字符串在后面小括号里面的字符串中的位置，没有则返回-1  toPath.indexOf('/pay')这句可以检测到包含pay这个字符串的所有路径，也就是检查/pay 和 /paysuccess 两个路径，/center就是携带这个字符串的路径都不能跳转
+    if(toPath.indexOf('/trade') != -1 || toPath.indexOf('/pay') != -1 || toPath.indexOf('/center') != -1) {
+      // next('/login')
+      // 这里 ?key=value是query参数的固定写法
+      next(`/login/?redirect=${toPath}`)
+    } else {
+      // 在未登录状态下跳转到除上面路径外的路径直接放行
+      next()
+    }
   }
-
-  // 阻止非登录状态下跳到购物车
-  if (to.path === '/shopcart') {
-    if (tokenStr)
-      next();
-    else
-      next('/login')
-  }
-
   // 路由导航守卫拦截下来后，如果上述条件都不符合，一个next都没有返回的话，最后这里一定要无条件放行，不然拦截下来，不放行，之后的执行都进行不了了
-  next()
+  next()  //上面已经拦截了所有的情况了，这里这句其实现在要不要都无所谓
 })
 
 // 将路由暴露
