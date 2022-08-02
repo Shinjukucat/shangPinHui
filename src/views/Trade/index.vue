@@ -82,7 +82,7 @@
       </div>
     </div>
     <div class="sub clearFix">
-      <router-link class="subBtn" to="/pay">提交订单</router-link>
+      <a class="subBtn" @click="submitOrder">提交订单</a>
     </div>
   </div>
 </template>
@@ -93,7 +93,9 @@ import {mapState, mapGetters} from 'vuex'
     name: 'Trade',
     data() {
       return {
-        message: ''
+        message: '',
+        // 订单号
+        orderId: ''
       }
     },
     mounted() {
@@ -121,12 +123,37 @@ import {mapState, mapGetters} from 'vuex'
       }
     },
     methods: {
-      // 点击谁，谁就变成默认地址，其他去掉默认地址
+      // 点击谁，谁就变成默认地址，其他去掉默认地址 ，排他思想
       changeDefault(user) {
         this.userAddressList.forEach(item => {
           item.isDefault = '0';
         });
         user.isDefault = '1'
+      },
+      async submitOrder() {
+        // console.log(this.$http)
+        const {traderNo} = this.orderInfo;
+        const data = {
+          consignee: this.defaultUserAddress.consignee,
+          consigneeTel: this.defaultUserAddress.phoneNum,
+          deliveryAddress: this.defaultUserAddress.fullAddress,
+          paymentWay: "ONLINE",
+          orderComment: this.message,
+          orderDetailList: this.orderInfo.detailArrayList  //商品清单
+        };
+        // 这里当然也可以用if else写，一样的
+        try {
+          let result = await this.$http.reqCommitOrder(traderNo, data);
+          console.log(result)
+          // 因为提交成功后得到的订单号之后还要用，所以，这里要保存一下
+          if(result.code === 200) {
+            this.orderId = result.data;
+            // 路由跳转中使用query传参
+            this.$router.push(`/pay?orderId=/${this.orderId}`)
+          }
+        } catch (error) {
+          alert(error.message)
+        }
       }
     }
   }
