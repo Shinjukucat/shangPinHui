@@ -5,7 +5,7 @@ import router from '@/router/index'
 // 引入store
 import store from '@/store'
 // 引入element-ui
-import {Button, MessageBox} from 'element-ui'
+import {Button, MessageBox, Form, FormItem, Input} from 'element-ui'
 
 // 阻止显示当前生成模式的代码
 // Vue.config.productionTip = false
@@ -21,6 +21,9 @@ Vue.component(Carousel.name, Carousel)
 Vue.component(Pagination.name, Pagination)
 // 全局注册element-ui的组件，因为是按需引入，所以需要这一步
 Vue.component(Button.name, Button)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Input)
 // 另外一种注册element-ui组件的方法，挂载在原型上
 Vue.prototype.$msgbox = MessageBox;
 Vue.prototype.$alert = MessageBox.alert;
@@ -35,13 +38,13 @@ import 'swiper/css/swiper.css'
 import * as http from '@/api'
 
 // 引入图片懒加载的插件
-// import VueLazyload from 'vue-lazyload'
+import VueLazyload from 'vue-lazyload'
 // 引入图片懒加载的图片
-// import lazyloadingImg from '@/assets/lazyloading.gif'
+import lazyloadingImg from '@/assets/lazyloading.gif'
 // 注册插件
-// Vue.use(VueLazyload, {
-//   loading: lazyloadingImg
-// })
+Vue.use(VueLazyload, {
+  loading: lazyloadingImg
+})
 
 new Vue({
   render: h => h(App),
